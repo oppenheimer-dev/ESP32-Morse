@@ -13,9 +13,13 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define dash 4
 #define backspace 23
 #define enter 0
+#define buz_pin 18
+#define led_pin 2   
 
 const uint8_t dreb_delay = 230;
 uint32_t last_click = 0;
+uint32_t last_sound = 0;
+uint16_t sound_duration = 0;
 String currentMorse = "";
 String translatedText = "";
 
@@ -48,6 +52,33 @@ void updateDisplay() {
     display.display();
 }
 
+void physical_view(int ch = -1) {
+    uint32_t current_time = millis();
+
+    //on sound
+    if (ch == 0) {
+        tone(buz_pin, 750);
+        GPIO.out_w1ts=(1<<led_pin);
+        last_sound = current_time; 
+        sound_duration = 100;
+    } 
+    else if (ch == 1) {
+        tone(buz_pin, 750);
+        GPIO.out_w1ts=(1<<led_pin);
+        last_sound = current_time; 
+        sound_duration = 300;
+    }
+
+    //off sound 
+    if (sound_duration > 0) {
+        if (current_time - last_sound >= sound_duration) {
+            noTone(buz_pin);
+            GPIO.out_w1tc=(1<<led_pin);
+            sound_duration = 0;
+        }
+    }
+}
+
 void click() {
     uint32_t current_time = millis();
 
@@ -56,6 +87,7 @@ void click() {
             last_click = current_time;
             currentMorse += ".";
             Serial.println(currentMorse);
+            playBuzzer(0);
             updateDisplay();
         }
     }
@@ -64,6 +96,7 @@ void click() {
             last_click = current_time;
             currentMorse += "-";
             Serial.println(currentMorse);
+            playBuzzer(1);
             updateDisplay();
         }
     }
@@ -89,7 +122,7 @@ void click() {
 
 void setup() {
     Serial.begin(9600);
-    
+    GPIO.enable_w1ts=(1<<led_pin);
     pinMode(dot, INPUT_PULLUP);
     pinMode(dash, INPUT_PULLUP);
     pinMode(enter, INPUT_PULLUP);
@@ -106,4 +139,5 @@ void setup() {
 
 void loop() {
     click();
+    physical_view();
 }
