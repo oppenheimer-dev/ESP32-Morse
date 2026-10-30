@@ -2,7 +2,7 @@
 
 A high-performance, non-blocking hardware Morse code terminal built on the **ESP32** microcontroller. Designed with low-level register manipulation, asynchronous state timing, an I2C OLED display, and multi-sensory feedback (piezo-acoustic + optical indication).
 
-![Circuit Diagram](wiring.png)
+![Circuit Diagram](image.png)
 
 ---
 
