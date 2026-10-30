@@ -11,9 +11,10 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 #define dot 15
 #define dash 4
+#define backspace 23
 #define enter 0
 
-const uint8_t dreb_delay = 150;
+const uint8_t dreb_delay = 230;
 uint32_t last_click = 0;
 String currentMorse = "";
 String translatedText = "";
@@ -69,9 +70,19 @@ void click() {
     if (digitalRead(enter) == LOW) {
         if (current_time - last_click > dreb_delay) {
             last_click = current_time;
-            currentMorse += " | ";
+            currentMorse += "| ";
             Serial.println(currentMorse);
             updateDisplay();
+        }
+    }
+    if(digitalRead(backspace) == LOW){
+        if(current_time -  last_click > dreb_delay){
+            last_click = current_time;
+            if(currentMorse.length() >0){
+                currentMorse.remove(currentMorse.length() - 1);
+                Serial.println(currentMorse);
+                updateDisplay();
+            }
         }
     }
 }
@@ -82,6 +93,7 @@ void setup() {
     pinMode(dot, INPUT_PULLUP);
     pinMode(dash, INPUT_PULLUP);
     pinMode(enter, INPUT_PULLUP);
+    pinMode(backspace, INPUT_PULLUP);
 
     if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
         Serial.println(F("SSD1306 allocation failed"));
