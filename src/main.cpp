@@ -87,7 +87,7 @@ void click() {
             last_click = current_time;
             currentMorse += ".";
             Serial.println(currentMorse);
-            playBuzzer(0);
+            physical_view(0);
             updateDisplay();
         }
     }
@@ -96,7 +96,7 @@ void click() {
             last_click = current_time;
             currentMorse += "-";
             Serial.println(currentMorse);
-            playBuzzer(1);
+            physical_view(1);
             updateDisplay();
         }
     }
