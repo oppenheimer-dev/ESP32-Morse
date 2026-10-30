@@ -23,6 +23,37 @@ uint16_t sound_duration = 0;
 String currentMorse = "";
 String translatedText = "";
 
+struct MorseCode {
+    const char* pattern; 
+    char letter;         
+};
+
+// 2. Таблица всего алфавита и цифр)
+const MorseCode morseTable[] = {
+    {".-", 'A'},   {"-...", 'B'}, {"-.-.", 'C'}, {"-..", 'D'},
+    {".", 'E'},    {"..-.", 'F'}, {"--.", 'G'},  {"....", 'H'},
+    {"..", 'I'},   {".---", 'J'}, {"-.-", 'K'},  {".-..", 'L'},
+    {"--", 'M'},   {"-.", 'N'},   {"---", 'O'},  {".--.", 'P'},
+    {"--.-", 'Q'}, {".-.", 'R'},  {"...", 'S'},  {"-", 'T'},
+    {"..-", 'U'},  {"...-", 'V'}, {".--", 'W'},  {"-..-", 'X'},
+    {"-.--", 'Y'}, {"--..", 'Z'},
+    {"-----", '0'}, {".----", '1'}, {"..---", '2'}, {"...--", '3'},
+    {"....-", '4'}, {".....", '5'}, {"-....", '6'}, {"--...", '7'},
+    {"---..", '8'}, {"----.", '9'}
+};
+
+const int tableSize = sizeof(morseTable) / sizeof(morseTable[0]);
+
+
+char decodeMorse(String morse) {
+    for (int i = 0; i < tableSize; i++) {
+        if (morse == morseTable[i].pattern) {
+            return morseTable[i].letter; 
+        }
+    }
+    return '?'; 
+}
+
 void updateDisplay() {
     display.clearDisplay();
 
@@ -103,7 +134,17 @@ void click() {
     if (digitalRead(enter) == LOW) {
         if (current_time - last_click > dreb_delay) {
             last_click = current_time;
-            currentMorse += "| ";
+            if (currentMorse.length() > 0) {
+            char decodedChar = decodeMorse(currentMorse);
+
+            translatedText += decodedChar;
+            currentMorse = ""; 
+            
+            Serial.print(F("Decoded: "));
+            Serial.println(decodedChar);
+        } else {
+            translatedText += " ";
+        }
             Serial.println(currentMorse);
             updateDisplay();
         }
